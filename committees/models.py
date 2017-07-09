@@ -31,6 +31,8 @@ COMMITTEE_PROTOCOL_PAGINATE_BY = 120
 logger = logging.getLogger("open-knesset.committees.models")
 
 
+
+
 class Committee(models.Model):
     name = models.CharField(max_length=256)
     # comma separated list of names used as name aliases for harvesting
@@ -196,8 +198,7 @@ class CommitteesMeetingsOnlyManager(CommitteeMeetingManager):
         return super(CommitteesMeetingsOnlyManager,
                      self).get_queryset().exclude(
             committee__type=CommitteeTypes.plenum)
-
-
+    
 class CommitteeMeeting(models.Model):
     committee = models.ForeignKey(Committee, related_name='meetings')
     date_string = models.CharField(max_length=256)
@@ -396,6 +397,12 @@ class CommitteeMeeting(models.Model):
     @cached_property
     def main_lobbyists_mentioned(self):
         return self.lobbyists_mentioned.all()
+
+class CommitteeMeetingAttendee(models.Model):
+    comittee_meeting = models.ForeignKey(CommitteeMeeting,related_name='attendees')
+    name = models.TextField(null=False,blank=False)
+    role = models.TextField(null=False,blank=False)
+    additional_information = models.TextField(null=True,blank=True)
 
 
 class ProtocolPartManager(models.Manager):
