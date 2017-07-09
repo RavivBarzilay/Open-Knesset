@@ -21,9 +21,7 @@ from mks.models import Knesset
 from lobbyists.models import LobbyistCorporation
 from itertools import groupby
 from hebrew_numbers import gematria_to_int
-from mks.utils import get_all_mk_names
-from knesset_data.protocols.committee import \
-    CommitteeMeetingProtocol as KnessetDataCommitteeMeetingProtocol
+
 from knesset_data_django.committees import members_extended
 
 COMMITTEE_PROTOCOL_PAGINATE_BY = 120
@@ -288,6 +286,7 @@ class CommitteeMeeting(models.Model):
         reparse_protocol(self, redownload, mks, mk_names)
 
     def update_from_dataservice(self, dataservice_object=None):
+        # TODO: obviousely broken, not sure what was here originaly and where it moved
         from committees.management.commands.scrape_committee_meetings import \
             Command as ScrapeCommitteeMeetingCommand
         from knesset_data.dataservice.committees import \
@@ -463,8 +462,6 @@ class TopicManager(models.Manager):
             'rank': '((100/%s*rating_score/(1+rating_votes+%s))+100)/2' % (
                 Topic.rating.range, Topic.rating.weight)
         }).order_by(order)
-        # TODO: rinse it so this will work
-        return self.get_public().by_rank()
 
 
 class Topic(models.Model):
@@ -517,7 +514,7 @@ class Topic(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('topic-detail', [str(self.id)])
+        return 'topic-detail', [str(self.id)]
 
     def __unicode__(self):
         return "%s" % self.title

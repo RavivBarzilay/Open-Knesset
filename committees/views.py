@@ -141,7 +141,6 @@ class CommitteeDetailView(DetailView):
             cached_context['topics'] = cm.topic_set.summary()[:5]
 
 
-
 class MeetingDetailView(DetailView):
     model = CommitteeMeeting
 
@@ -288,9 +287,10 @@ class MeetingDetailView(DetailView):
         if not cm.protocol_text:  # don't override existing protocols
             cm.protocol_text = request.POST.get('protocol_text')
             cm.save()
-            cm.create_protocol_parts()
             mks, mk_names = get_all_mk_names()
             cm.find_attending_members(mks, mk_names)
+            cm.create_protocol_parts(mks=mks, mk_names=mk_names)
+
 
     def _handle_remove_lobbyist(self, cm, request):
         lobbyist_name = request.POST.get('lobbyist_name')
@@ -484,7 +484,7 @@ def edit_topic(request, committee_id, topic_id=None):
                                                               {
                                                                   'edit_form': edit_form,
                                                                   'links_formset': links_formset,
-                                                                  }))
+                                                              }))
 
 
 @login_required
